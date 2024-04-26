@@ -110,7 +110,7 @@ def update_question(
 
     return QuestionShow(**db_question.__dict__, tags=tags)
 
-@router.delete("/questions/{question_id}", response_model=QuestionShow)
+@router.delete("/questions/{question_id}", response_model=dict)
 def delete_question(
     question_id: int,
     current_user: User = Depends(get_current_user),
@@ -123,13 +123,10 @@ def delete_question(
     if db_question.user_id != user.id:
         raise HTTPException(status_code=403, detail="You don't have permission to delete this question")
 
-    question_tags = db.query(QuestionTag).filter(QuestionTag.question_id == question_id).all()
-    tags = [schemas.Tag(tag_word=tag.tag.tag_word) for tag in db_question.tags]
-
     db.query(QuestionTag).filter(QuestionTag.question_id == question_id).delete()
     db.delete(db_question)
     db.commit()
 
-    return QuestionShow(**db_question.__dict__, tags=tags)
+    return {"message": "Question deleted successfully"}
 
 
