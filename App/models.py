@@ -3,6 +3,17 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from App.database import Base
 
+class UserVote(Base):
+    __tablename__ = "user_votes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    question_id = Column(Integer, ForeignKey("questions.id"), nullable=True)
+
+    user = relationship("User", back_populates="Votes")
+    question = relationship("Question", back_populates="Votes")
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -14,6 +25,7 @@ class User(Base):
     password = Column(String)
     date_joined = Column(DateTime(timezone=True), server_default=func.now())
 
+    Votes = relationship("UserVote", back_populates="user")
     questions = relationship("Question", back_populates="user")
     answers = relationship("Answer", back_populates="answered_by")
 
@@ -43,6 +55,7 @@ class Question(Base):
 
     tags = relationship("QuestionTag", back_populates="question")
     answers = relationship("Answer", back_populates="question")
+    Votes = relationship("UserVote", back_populates="question")
 
 class Answer(Base):
     __tablename__ = "answers"

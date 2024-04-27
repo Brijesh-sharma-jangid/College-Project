@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from App.models import Question, User, Tag, QuestionTag
+from App.models import Question, User, Tag, QuestionTag, UserVote
 from typing import List
 from App.database import get_db
 from App.schemas import QuestionShow, QuestionCreate, TagCreate, QuestionUpdate
@@ -128,5 +128,36 @@ def delete_question(
     db.commit()
 
     return {"message": "Question deleted successfully"}
+
+@router.post("/questions/{question_id}/vote")
+def upvote_question(
+    question_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    id = db.query(User).filter(User.email == current_user.email).first().id
+    existing_vote = db.query(UserVote).filter(
+        UserVote.user_id == id,
+        UserVote.question_id == question_id
+    ).first()
+    question = db.query(Question).filter(Question.id == question_id).first()
+    if not question:
+        raise HTTPException(status_code=404, detail="Question not found")
+    ok = 0
+    if existing_vote:
+        question.votes -= 1
+        db.delete(existing_vote)
+        ok = 1
+    else:
+        question.votes += 1
+        db.add(UserVote(user_id=id, question_id=question_id))
+
+    msg = "Question upvoted successfully"
+    if ok:
+        msg = "Question Downvoted successfully"
+    db.commit()
+    return {"message": msg}
+
+
 
 
