@@ -57,7 +57,7 @@ def delete_answer_for_question(question_id: int, answer_id: int, db: Session = D
     db_answer = db.query(Answer).filter(Answer.id == answer_id, Answer.question_id == question_id, Answer.user_id == user.id).first()
     if db_answer is None:
         raise HTTPException(status_code=404, detail="Answer not found")
-
+    user.ans_given -= 1
     db.delete(db_answer)
     db.commit()
 

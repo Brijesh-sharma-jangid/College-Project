@@ -157,7 +157,3 @@ def upvote_question(
         msg = "Question Downvoted successfully"
     db.commit()
     return {"message": msg}
-
-
-
-
