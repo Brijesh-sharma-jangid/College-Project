@@ -33,7 +33,7 @@ def create_answer_for_question(question_id: int, answer: AnswerCreate, db: Sessi
 # Retreive all answer for particular question
 @router.get("/questions/{question_id}/answers/", response_model=List[AnswerShow])
 def read_answer_for_question(question_id: int, db: Session = Depends(get_db)):
-    # Retrieve an answer for a specific question by ID
+
     answer = db.query(Answer).filter(Answer.question_id == question_id)
     if answer is None:
         raise HTTPException(status_code=404, detail="Answer not found")
@@ -43,7 +43,7 @@ def read_answer_for_question(question_id: int, db: Session = Depends(get_db)):
 # Retreive answer for particular user on a question
 @router.get("/questions/{question_id}/user/answer/", response_model=AnswerShow)
 def read_answer_for_question_for_user(question_id: int,current_user: schemas.User = Depends(get_current_user), db: Session = Depends(get_db)):
-    # Retrieve an answer for a specific question by ID
+    
     user = db.query(User).filter(User.email == current_user.email).first()
     answer = db.query(Answer).filter(Answer.question_id == question_id, Answer.user_id == user.id).first()
     if answer is None:
@@ -70,7 +70,6 @@ def update_answer_for_question(question_id: int, answer_id: int, answer: AnswerC
     if db_answer is None:
         raise HTTPException(status_code=404, detail="Answer not found")
 
-    # Update the answer fields
     for key, value in answer.dict().items():
         setattr(db_answer, key, value)
 

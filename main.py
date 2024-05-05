@@ -13,7 +13,7 @@ app.include_router(user.router)
 
 # Sql Admin
 from sqladmin import Admin, ModelView
-from App.models import User, Question
+from App.models import User, Question, Tag, Answer
 admin = Admin(app, engine)
 
 
@@ -21,6 +21,16 @@ class UserAdmin(ModelView, model=User):
     column_list = [User.id, User.name, User.email, User.ans_given]
 
 class QuestionAdmin(ModelView, model = Question):
-    column_list = [Question.id, Question.title, Question.ques_content, Question.votes, Question.views, Question.tags]
+    column_list = [Question.id, Question.title, Question.ques_content, Question.votes, Question.views, 
+                   Question.user_id]
+
+class TagAdmin(ModelView, model = Tag):
+    column_list = [Tag.id, Tag.tag_word]
+
+class AnswerAdmin(ModelView, model = Answer):
+    column_list = [Answer.id, Answer.ans_content, Answer.created_at, Answer.user_id, Answer.question_id]
+
 admin.add_view(UserAdmin)
 admin.add_view(QuestionAdmin)
+admin.add_view(TagAdmin)
+admin.add_view(AnswerAdmin)
