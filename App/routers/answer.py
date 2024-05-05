@@ -14,6 +14,11 @@ router = APIRouter(
 @router.post("/questions/{question_id}/answers/", response_model=AnswerShow)
 def create_answer_for_question(question_id: int, answer: AnswerCreate, db: Session = Depends(get_db), current_user: schemas.User = Depends(get_current_user)):
     user = db.query(User).filter(User.email == current_user.email).first()
+    
+    check = db.query(Answer).filter(Answer.user_id == user.id, Answer.question_id == question_id).first()
+    if check :
+        raise HTTPException(status_code = 200, detail="Answer already exist")
+    
     new_answer = Answer(**answer.dict(), question_id=question_id, user_id=user.id)
     user.ans_given += 1
     db.commit()
